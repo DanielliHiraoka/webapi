@@ -1,6 +1,10 @@
-from flask import Flask, request, jsonify, session
+from flask import Flask, request, jsonify, session, render_template
 from app import app, db
 from app.models import User
+
+@app.route('/')
+def home():
+    return "Bem-vindo ao meu site de e-commerce!"
 
 @app.route('/api/register', methods=['POST'])
 def register():
