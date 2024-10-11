@@ -4,7 +4,9 @@ from flask_migrate import Migrate
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)
+
+CORS(app, supports_credentials=True, resources={r"/api/*": {"origins": "http://localhost:3000"}})
+
 
 app.config['SECRET_KEY'] = 'a1b2c3d4e5f6g7h8i9j0k1234567890abcdefg'
 
