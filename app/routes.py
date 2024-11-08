@@ -29,7 +29,7 @@ def register():
 
     # Criar novo usuário
     new_user = User(username=username, email=email, phone=phone, preferences=preferences)
-    new_user.set_password(password)  # Criptografar senha
+    new_user.set_password(password)  
     db.session.add(new_user)
     db.session.commit()
 
@@ -65,10 +65,10 @@ def get_profile():
             "email": user.email,
             "phone": user.phone,
             "preferences": user.preferences,
-            "address": user.address,  # Incluindo o endereço no perfil
-            "city": user.city,        # Incluindo a cidade no perfil
-            "state": user.state,      # Incluindo o estado no perfil
-            "postal_code": user.postal_code  # Incluindo o CEP no perfil
+            "address": user.address,  
+            "city": user.city,        
+            "state": user.state,      
+            "postal_code": user.postal_code  
         })
     else:
         return jsonify({"message": "Usuário não encontrado!"}), 404
@@ -92,7 +92,7 @@ def update_profile():
         state = data.get("state")
         postal_code = data.get("postal_code")
 
-        # Validações básicas
+        
         if not username or not email or not phone:
             return jsonify({"message": "Todos os campos obrigatórios devem ser preenchidos!"}), 400
 
@@ -114,3 +114,56 @@ def update_profile():
             return jsonify({"message": "Erro ao atualizar o perfil."}), 500
     else:
         return jsonify({"message": "Usuário não encontrado!"}), 404
+    
+from flask import Flask, jsonify, request
+from models import Cat, AdoptionProposal  # Ajuste conforme seus modelos
+
+app = Flask(__name__)
+
+# Endpoint para listar todos os gatos
+@app.route('/api/cats', methods=['GET'])
+def get_cats():
+    cats = Cat.query.all()
+    return jsonify([{
+        'id': cat.id,
+        'name': cat.name,
+        'age': cat.age,
+        'description': cat.description,
+        'image': cat.image_url
+    } for cat in cats])
+
+
+@app.route('/api/cats/<int:cat_id>', methods=['GET'])
+def get_cat(cat_id):
+    cat = Cat.query.get(cat_id)
+    if not cat:
+        return jsonify({'error': 'Cat not found'}), 404
+    return jsonify({
+        'id': cat.id,
+        'name': cat.name,
+        'age': cat.age,
+        'description': cat.description,
+        'image': cat.image_url
+    })
+    
+    
+ 
+@app.route('/api/adoption', methods=['POST'])
+def create_adoption_proposal():
+    data = request.get_json()
+    name = data.get('name')
+    contact = data.get('contact')
+    reason = data.get('reason')
+    cat_id = data.get('catId')
+
+    # Validação básica
+    if not all([name, contact, reason, cat_id]):
+        return jsonify({'error': 'Dados incompletos'}), 400
+
+    # Criação da proposta
+    proposal = AdoptionProposal(name=name, contact=contact, reason=reason, cat_id=cat_id)
+    db.session.add(proposal)
+    db.session.commit()
+
+    return jsonify({'message': 'Proposta de adoção enviada com sucesso!'}), 201
+
