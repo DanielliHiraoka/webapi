@@ -28,3 +28,4 @@ migrate = Migrate(app, db)
 
 
 from app import routes
+from app.models import Cat, AdoptionProposal
